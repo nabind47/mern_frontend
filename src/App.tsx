@@ -1,20 +1,37 @@
-import { Button } from "@/components/ui/button"
+import { Route, Routes } from "react-router"
+
+import AuthLayout from "./layouts/auth-layout"
+import MainLayout from "./layouts/main-layout"
+
+import HomePage from "./pages/home"
+import LoginPage from "./pages/login"
+import ProductsPage from "./pages/products"
+import RegisterPage from "./pages/register"
 
 export function App() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
+    <Routes>
+      <Route element={<AuthLayout />}>
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+      </Route>
+
+      <Route element={<MainLayout />}>
+        <Route index element={<HomePage />} />
+
+        <Route path="products">
+          <Route index element={<ProductsPage />} />
+          <Route path=":slug" element={<h1>Product Details</h1>} />
+        </Route>
+
+        <Route path="blogs">
+          <Route index element={<h1>Blogs</h1>} />
+          <Route path="create" element={<h1>Create</h1>} />
+          <Route path="edit" element={<h1>Edit</h1>} />
+          <Route path=":slug" element={<h1>Details</h1>} />
+        </Route>
+      </Route>
+    </Routes>
   )
 }
 
