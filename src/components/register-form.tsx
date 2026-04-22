@@ -1,3 +1,4 @@
+import api from "@/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -9,17 +10,64 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { NavLink } from "react-router"
+import { useAuthStore } from "@/store/user.store"
+import { useMutation } from "@tanstack/react-query"
+import type { AxiosError } from "axios"
+import { useState } from "react"
+import { NavLink, useNavigate } from "react-router"
+
+const registerUser = async (data: {
+  name: string
+  email: string
+  password: string
+}): Promise<{ accessToken: string }> => {
+  const response = await api.post("/users/register", data)
+  return response.data
+}
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigate = useNavigate()
+  const { setAccessToken } = useAuthStore()
+
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const [errors, setErrors] = useState("")
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    if (password !== confirmPassword) {
+      setErrors("Passwords do not match")
+      return
+    }
+
+    mutation.mutate({ name, email, password })
+  }
+
+  const mutation = useMutation({
+    mutationFn: registerUser,
+    onSuccess: (data) => {
+      setAccessToken(data.accessToken)
+      navigate("/", { replace: true })
+    },
+    onError: (data: AxiosError<{ message: string }>) => {
+      setErrors(
+        (data.response?.data.message as string) ?? "Internal Server Error"
+      )
+    },
+  })
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -30,7 +78,14 @@ export function RegisterForm({
 
               <Field>
                 <FieldLabel htmlFor="name">Name</FieldLabel>
-                <Input id="name" type="text" placeholder="John Doe" required />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </Field>
 
               <Field>
@@ -40,13 +95,21 @@ export function RegisterForm({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -54,7 +117,16 @@ export function RegisterForm({
                     Confirm Password
                   </FieldLabel>
                 </div>
-                <Input id="confirmPassword" type="confirmPassword" required />
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </Field>
+              <Field>
+                {errors && <p className="text-sm text-red-500">{errors}</p>}
               </Field>
               <Field>
                 <Button type="submit">Register</Button>
