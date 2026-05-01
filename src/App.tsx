@@ -7,6 +7,15 @@ import HomePage from "./pages/home"
 import LoginPage from "./pages/login"
 import ProductsPage from "./pages/products"
 import RegisterPage from "./pages/register"
+import CreateProductPage from "./pages/create-product"
+import EditProductPage from "./pages/edit-product"
+import AdminDashboard from "./pages/admin-dashboard"
+import CartPage from "./pages/cart"
+import CheckoutPage from "./pages/checkout"
+import OrdersPage from "./pages/orders"
+import AdminOrdersPage from "./pages/admin-orders"
+import AdminBannersPage from "./pages/admin-banners"
+import ProductDetailPage from "./pages/product-detail"
 
 export function App() {
   return (
@@ -18,10 +27,18 @@ export function App() {
 
       <Route element={<MainLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="admin" element={<AdminDashboard />} />
+        <Route path="admin/banners" element={<AdminBannersPage />} />
+        <Route path="cart" element={<CartPage />} />
+        <Route path="checkout" element={<CheckoutPage />} />
+        <Route path="orders" element={<OrdersPage />} />
+        <Route path="admin/orders" element={<AdminOrdersPage />} />
 
         <Route path="products">
           <Route index element={<ProductsPage />} />
-          <Route path=":slug" element={<h1>Product Details</h1>} />
+          <Route path="create" element={<CreateProductPage />} />
+          <Route path="edit/:id" element={<EditProductPage />} />
+          <Route path=":slug" element={<ProductDetailPage />} />
         </Route>
 
         <Route path="blogs">

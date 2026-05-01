@@ -14,6 +14,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import { useCartStore } from "@/store/cart.store"
 import { useAuthStore } from "@/store/user.store"
 import { useQuery } from "@tanstack/react-query"
 import {
@@ -24,10 +25,11 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Skeleton } from "./ui/skeleton"
+import NotificationComponent from "./notification-component"
 
 const fetchUser = async (
   token: string
-): Promise<{ name: string; email: string }> => {
+): Promise<{ name: string; email: string; role: string }> => {
   const response = await api.get("/users/profile", {
     headers: { Authorization: `Bearer ${token}` },
   })
@@ -36,7 +38,8 @@ const fetchUser = async (
 
 const SiteHeader = () => {
   const navigate = useNavigate()
-  const { accessToken, removeToken } = useAuthStore()
+  const { accessToken, removeToken, role } = useAuthStore()
+  const { getItemCount } = useCartStore()
 
   const { isLoading, data } = useQuery({
     queryKey: ["profile"],
@@ -83,8 +86,16 @@ const SiteHeader = () => {
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <Button>
-          <ShoppingBagIcon />
+        {accessToken && <NotificationComponent />}
+        <Button asChild variant="outline">
+          <NavLink to="/cart" className="relative">
+            <ShoppingBagIcon />
+            {getItemCount() > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                {getItemCount()}
+              </span>
+            )}
+          </NavLink>
         </Button>
 
         {isLoading ? (
@@ -101,6 +112,22 @@ const SiteHeader = () => {
               <Button variant="outline">{data.name}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <NavLink to="/orders">My Orders</NavLink>
+              </DropdownMenuItem>
+              {role === "admin" && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <NavLink to="/admin">Admin Dashboard</NavLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NavLink to="/admin/banners">Manage Banners</NavLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NavLink to="/admin/orders">Manage Orders</NavLink>
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuItem
                 variant="destructive"
                 className="cursor-pointer"
