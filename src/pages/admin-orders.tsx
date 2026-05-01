@@ -23,7 +23,7 @@ interface Order {
       _id: string
       title: string
       price: number
-      coverImage: string
+      coverImage?: string
     }
     quantity: number
     price: number
@@ -142,18 +142,22 @@ const AdminOrdersPage = () => {
                     {order.items.map((item, index) => (
                       <div key={index} className="flex items-center gap-4">
                         <img
-                          src={`http://localhost:8000${item.product.coverImage}`}
-                          alt={item.product.title}
+                          src={
+                            item.product?.coverImage
+                              ? `http://localhost:8000${item.product.coverImage}`
+                              : "/placeholder-image.jpg"
+                          }
+                          alt={item.product?.title}
                           className="h-12 w-12 rounded object-cover"
                         />
                         <div className="flex-1">
-                          <p className="font-medium">{item.product.title}</p>
+                          <p className="font-medium">{item.product?.title}</p>
                           <p className="text-sm text-muted-foreground">
-                            Qty: {item.quantity} × NRS {item.price}
+                            Qty: {item?.quantity} × NRS {item?.price}
                           </p>
                         </div>
                         <p className="font-medium">
-                          NRS {item.price * item.quantity}
+                          NRS {item?.price * item?.quantity}
                         </p>
                       </div>
                     ))}
@@ -163,17 +167,18 @@ const AdminOrdersPage = () => {
                 <div className="border-t pt-4">
                   <div className="flex justify-between">
                     <span className="font-medium">Total:</span>
-                    <span className="font-bold">NRS {order.total}</span>
+                    <span className="font-bold">NRS {order?.total}</span>
                   </div>
                 </div>
 
                 <div>
                   <h4 className="mb-2 font-medium">Shipping Address:</h4>
                   <p className="text-sm text-muted-foreground">
-                    {order.shippingAddress.street}, {order.shippingAddress.city}
-                    , {order.shippingAddress.state}{" "}
-                    {order.shippingAddress.zipCode},{" "}
-                    {order.shippingAddress.country}
+                    {order?.shippingAddress?.street},{" "}
+                    {order?.shippingAddress?.city},{" "}
+                    {order?.shippingAddress?.state}{" "}
+                    {order?.shippingAddress?.zipCode},{" "}
+                    {order?.shippingAddress?.country}
                   </p>
                 </div>
               </div>
